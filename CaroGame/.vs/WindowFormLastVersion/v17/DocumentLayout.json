@@ -1,121 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|d:\\vs_code_owo\\windowsforms\\windowformlastversion\\windowformlastversion\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|solutionrelative:windowformlastversion\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|d:\\vs_code_owo\\windowsforms\\windowformlastversion\\windowformlastversion\\nameinputdialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|solutionrelative:windowformlastversion\\nameinputdialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|d:\\vs_code_owo\\windowsforms\\windowformlastversion\\windowformlastversion\\winnerdialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|solutionrelative:windowformlastversion\\winnerdialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|d:\\vs_code_owo\\windowsforms\\windowformlastversion\\windowformlastversion\\difficultyselectform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|solutionrelative:windowformlastversion\\difficultyselectform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|d:\\vs_code_owo\\windowsforms\\windowformlastversion\\windowformlastversion\\carogameform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|solutionrelative:windowformlastversion\\carogameform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|d:\\vs_code_owo\\windowsforms\\windowformlastversion\\windowformlastversion\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{C8115ACD-5D6E-4C4F-B038-3B0D622CC942}|WindowFormLastVersion\\WindowFormLastVersion.csproj|solutionrelative:windowformlastversion\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": [
-        {
-          "DockedWidth": 200,
-          "SelectedChildIndex": 0,
-          "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Form1.cs",
-              "DocumentMoniker": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\Form1.cs",
-              "RelativeDocumentMoniker": "WindowFormLastVersion\\Form1.cs",
-              "ToolTip": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\Form1.cs",
-              "RelativeToolTip": "WindowFormLastVersion\\Form1.cs",
-              "ViewState": "AgIAADwAAAAAAAAAAAAYwHkAAAAmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-02T07:03:23.57Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "NameInputDialog.cs",
-              "DocumentMoniker": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\NameInputDialog.cs",
-              "RelativeDocumentMoniker": "WindowFormLastVersion\\NameInputDialog.cs",
-              "ToolTip": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\NameInputDialog.cs",
-              "RelativeToolTip": "WindowFormLastVersion\\NameInputDialog.cs",
-              "ViewState": "AgIAAI8AAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-02T07:03:17.959Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "WinnerDialog.cs",
-              "DocumentMoniker": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\WinnerDialog.cs",
-              "RelativeDocumentMoniker": "WindowFormLastVersion\\WinnerDialog.cs",
-              "ToolTip": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\WinnerDialog.cs",
-              "RelativeToolTip": "WindowFormLastVersion\\WinnerDialog.cs",
-              "ViewState": "AgIAAEgAAAAAAAAAAAAYwFYAAAAMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-02T07:02:54.068Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "DifficultySelectForm.cs",
-              "DocumentMoniker": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\DifficultySelectForm.cs",
-              "RelativeDocumentMoniker": "WindowFormLastVersion\\DifficultySelectForm.cs",
-              "ToolTip": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\DifficultySelectForm.cs",
-              "RelativeToolTip": "WindowFormLastVersion\\DifficultySelectForm.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADMAAAA+AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-02T07:02:05.958Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "CaroGameForm.cs",
-              "DocumentMoniker": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\CaroGameForm.cs",
-              "RelativeDocumentMoniker": "WindowFormLastVersion\\CaroGameForm.cs",
-              "ToolTip": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\CaroGameForm.cs",
-              "RelativeToolTip": "WindowFormLastVersion\\CaroGameForm.cs",
-              "ViewState": "AgIAAHQCAAAAAAAAAADwv30CAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-02T06:58:53.195Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Form1.cs [Design]",
-              "DocumentMoniker": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\Form1.cs",
-              "RelativeDocumentMoniker": "WindowFormLastVersion\\Form1.cs",
-              "ToolTip": "D:\\VS_CODE_OwO\\WindowsForms\\WindowFormLastVersion\\WindowFormLastVersion\\Form1.cs [Design]",
-              "RelativeToolTip": "WindowFormLastVersion\\Form1.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-24T07:15:22.175Z",
-              "EditorCaption": " [Design]"
-            }
-          ]
-        }
-      ]
+      "DocumentGroups": []
     }
   ]
 }
