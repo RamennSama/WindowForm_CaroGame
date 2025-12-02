@@ -1,2 +1,2 @@
 # WindowForm_CaroGame
-for subject
+For subject
