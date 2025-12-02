@@ -1,0 +1,158 @@
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace WindowFormLastVersion
+{
+    public partial class DifficultySelectForm : Form
+    {
+        public CaroGameForm.GameDifficulty SelectedDifficulty { get; private set; }
+        public int MaxGames { get; private set; } = 5;
+
+        private NumericUpDown numMaxGames;
+        private Button btnOK;
+        private Button btnCancel;
+        private Button selectedButton = null;
+
+        public DifficultySelectForm()
+        {
+            InitializeComponent();
+            SetupForm();
+        }
+
+        private void InitializeComponent()
+        {
+            Text = "Game Settings";
+            ClientSize = new Size(400, 220);
+            StartPosition = FormStartPosition.CenterParent;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            BackColor = Color.White;
+        }
+
+        private void SetupForm()
+        {
+            // Title
+            var lblTitle = new Label
+            {
+                Text = "Select Difficulty",
+                Font = new Font("Times New Roman", 16, FontStyle.Bold),
+                Location = new Point(0, 15),
+                Size = new Size(400, 30),
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            var easyButton = new Button
+            {
+                Text = "Easy",
+                Location = new Point(100, 55),
+                Size = new Size(200, 30),
+                BackColor = SystemColors.ButtonFace,
+                Font = new Font("Times New Roman", 12),
+                UseVisualStyleBackColor = true
+            };
+            easyButton.Click += (s, e) => SelectDifficulty(easyButton, CaroGameForm.GameDifficulty.Easy);
+
+            var mediumButton = new Button
+            {
+                Text = "Medium",
+                Location = new Point(100, 90),
+                Size = new Size(200, 30),
+                BackColor = SystemColors.ButtonFace,
+                Font = new Font("Times New Roman", 12),
+                UseVisualStyleBackColor = true
+            };
+            mediumButton.Click += (s, e) => SelectDifficulty(mediumButton, CaroGameForm.GameDifficulty.Medium);
+
+            var hardButton = new Button
+            {
+                Text = "Hard",
+                Location = new Point(100, 125),
+                Size = new Size(200, 30),
+                BackColor = SystemColors.ButtonFace,
+                Font = new Font("Times New Roman", 12),
+                UseVisualStyleBackColor = true
+            };
+            hardButton.Click += (s, e) => SelectDifficulty(hardButton, CaroGameForm.GameDifficulty.Hard);
+
+            // Label for max games
+            var lblMaxGames = new Label
+            {
+                Text = "Number of Games:",
+                Font = new Font("Times New Roman", 12),
+                Location = new Point(30, 165),
+                Size = new Size(120, 25)
+            };
+
+            // Numeric up down for max games
+            numMaxGames = new NumericUpDown
+            {
+                Font = new Font("Times New Roman", 12),
+                Location = new Point(150, 165),
+                Size = new Size(70, 25),
+                Minimum = 1,
+                Maximum = 10,
+                Value = 5
+            };
+
+            // OK Button
+            btnOK = new Button
+            {
+                Text = "OK",
+                Font = new Font("Times New Roman", 12),
+                Location = new Point(150, 170),
+                Size = new Size(110, 35),
+                UseVisualStyleBackColor = true,
+                DialogResult = DialogResult.OK
+            };
+            btnOK.Click += BtnOK_Click;
+
+            // Cancel Button
+            btnCancel = new Button
+            {
+                Text = "Cancel",
+                Font = new Font("Times New Roman", 12),
+                Location = new Point(270, 170),
+                Size = new Size(110, 35),
+                UseVisualStyleBackColor = true,
+                DialogResult = DialogResult.Cancel
+            };
+
+            Controls.AddRange(new Control[] { lblTitle, easyButton, mediumButton, hardButton, lblMaxGames, numMaxGames, btnOK, btnCancel });
+            this.AcceptButton = btnOK;
+            this.CancelButton = btnCancel;
+        }
+
+        private void SelectDifficulty(Button clickedButton, CaroGameForm.GameDifficulty difficulty)
+        {
+            // Reset previous selection
+            if (selectedButton != null)
+            {
+                selectedButton.BackColor = SystemColors.ButtonFace;
+                selectedButton.UseVisualStyleBackColor = true;
+            }
+
+            // Set new selection
+            selectedButton = clickedButton;
+            selectedButton.BackColor = SystemColors.ActiveCaption;
+            selectedButton.UseVisualStyleBackColor = false;
+
+            SelectedDifficulty = difficulty;
+        }
+
+        private void BtnOK_Click(object sender, EventArgs e)
+        {
+            if (SelectedDifficulty != default(CaroGameForm.GameDifficulty))
+            {
+                MaxGames = (int)numMaxGames.Value;
+                DialogResult = DialogResult.OK;
+                Close();
+            }
+            else
+            {
+                MessageBox.Show("Please select a difficulty level.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+    }
+}

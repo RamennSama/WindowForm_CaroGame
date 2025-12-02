@@ -1,0 +1,44 @@
+﻿using System;
+using System.Windows.Forms;
+
+namespace WindowFormLastVersion
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // Two players mode
+            var gameForm = new CaroGameForm(playWithComputer: false);
+            gameForm.ShowDialog();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Text = "Caro Game";
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // Play with computer - show difficulty selection
+            using var difficultyForm = new DifficultySelectForm();
+            if (difficultyForm.ShowDialog() == DialogResult.OK)
+            {
+                var gameForm = new CaroGameForm(playWithComputer: true, difficulty: difficultyForm.SelectedDifficulty);
+                gameForm.ShowDialog();
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to exit the application?", "Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
+        }
+    }
+}

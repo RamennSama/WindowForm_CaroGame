@@ -1,0 +1,348 @@
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace WindowFormLastVersion
+{
+    public partial class CaroGameForm : Form
+    {
+        private const int BOARD_SIZE = 15; // 15x15 board
+    private const int CELL_SIZE = 40;
+        private const int MARGIN = 30;
+
+        private Button[,] _board;
+        private bool _isPlayerXTurn = true; // X goes first
+      private bool _isPlayingWithComputer;
+   private GameDifficulty _difficulty;
+
+        public enum GameDifficulty
+    {
+         Easy,
+Medium,
+Hard
+   }
+
+        public CaroGameForm(bool playWithComputer = false, GameDifficulty difficulty = GameDifficulty.Easy)
+   {
+       InitializeComponent();
+            _isPlayingWithComputer = playWithComputer;
+       _difficulty = difficulty;
+   SetupGame();
+        }
+
+        private void InitializeComponent()
+     {
+            Text = _isPlayingWithComputer ? $"Caro Game - Playing with Computer ({_difficulty})" : "Caro Game - 2 Players";
+    ClientSize = new Size(BOARD_SIZE * CELL_SIZE + 2 * MARGIN, BOARD_SIZE * CELL_SIZE + 2 * MARGIN);
+            BackColor = Color.White;
+    FormBorderStyle = FormBorderStyle.FixedSingle;
+         MaximizeBox = false;
+            StartPosition = FormStartPosition.CenterScreen;
+        }
+
+        private void SetupGame()
+        {
+  _board = new Button[BOARD_SIZE, BOARD_SIZE];
+
+  for (int i = 0; i < BOARD_SIZE; i++)
+            {
+        for (int j = 0; j < BOARD_SIZE; j++)
+       {
+  var cell = new Button
+            {
+      Location = new Point(MARGIN + j * CELL_SIZE, MARGIN + i * CELL_SIZE),
+  Size = new Size(CELL_SIZE, CELL_SIZE),
+ BackColor = Color.White,
+            Font = new Font(Font.FontFamily, 16, FontStyle.Bold),
+             Tag = new Point(i, j)
+      };
+         cell.Click += Cell_Click;
+       Controls.Add(cell);
+_board[i, j] = cell;
+                }
+  }
+  }
+
+        private void Cell_Click(object sender, EventArgs e)
+        {
+            var button = (Button)sender;
+if (!string.IsNullOrEmpty(button.Text)) return;
+
+          // Player's move
+            button.Text = _isPlayerXTurn ? "X" : "O";
+    button.ForeColor = _isPlayerXTurn ? Color.Blue : Color.Red;
+
+            if (CheckWin((Point)button.Tag))
+   {
+                MessageBox.Show($"Player {(_isPlayerXTurn ? "X" : "O")} wins!");
+      ResetGame();
+                return;
+     }
+
+   _isPlayerXTurn = !_isPlayerXTurn;
+
+            // Computer's move
+    if (_isPlayingWithComputer && !_isPlayerXTurn)
+    {
+      MakeComputerMove();
+            }
+        }
+
+        private void MakeComputerMove()
+    {
+            Point move = GetComputerMove();
+ var button = _board[move.X, move.Y];
+        button.Text = "O";
+     button.ForeColor = Color.Red;
+
+      if (CheckWin(move))
+         {
+       MessageBox.Show("Computer wins!");
+                ResetGame();
+     return;
+         }
+
+ _isPlayerXTurn = true;
+        }
+
+        private Point GetComputerMove()
+        {
+    switch (_difficulty)
+  {
+  case GameDifficulty.Easy:
+           return GetRandomMove();
+     case GameDifficulty.Medium:
+     return Random.Shared.Next(0, 2) == 0 ? GetRandomMove() : GetSmartMove();
+                case GameDifficulty.Hard:
+     return GetSmartMove();
+                default:
+                    return GetRandomMove();
+   }
+  }
+
+        private Point GetRandomMove()
+        {
+            var emptyCells = new List<Point>();
+            for (int i = 0; i < BOARD_SIZE; i++)
+       {
+    for (int j = 0; j < BOARD_SIZE; j++)
+ {
+      if (string.IsNullOrEmpty(_board[i, j].Text))
+        {
+     emptyCells.Add(new Point(i, j));
+     }
+            }
+      }
+          int index = Random.Shared.Next(emptyCells.Count);
+  return emptyCells[index];
+    }
+
+     private Point GetSmartMove()
+        {
+    // First check for winning moves
+          var winningMove = FindBestMove("O", 5); // Look for 5 in a row
+         if (winningMove.HasValue) return winningMove.Value;
+
+      // Then check for blocking opponent's winning moves
+    var blockingMove = FindBestMove("X", 4); // Block 4 in a row
+        if (blockingMove.HasValue) return blockingMove.Value;
+
+            if (_difficulty == GameDifficulty.Hard)
+  {
+           // Look for creating 4-in-a-row opportunities
+       var fourInRow = FindBestMove("O", 4);
+                if (fourInRow.HasValue) return fourInRow.Value;
+
+       // Look for blocking opponent's 3-in-a-row
+         var blockThree = FindBestMove("X", 3);
+       if (blockThree.HasValue) return blockThree.Value;
+
+                // Look for creating 3-in-a-row opportunities
+             var threeInRow = FindBestMove("O", 3);
+     if (threeInRow.HasValue) return threeInRow.Value;
+            }
+            else if (_difficulty == GameDifficulty.Medium)
+   {
+      // Medium difficulty will block opponent's 3-in-a-row 70% of the time
+   if (Random.Shared.Next(100) < 70)
+        {
+            var blockThree = FindBestMove("X", 3);
+ if (blockThree.HasValue) return blockThree.Value;
+      }
+
+  // Try to create own 3-in-a-row 50% of the time
+                if (Random.Shared.Next(100) < 50)
+                {
+var threeInRow = FindBestMove("O", 3);
+         if (threeInRow.HasValue) return threeInRow.Value;
+     }
+     }
+
+   // If no strategic moves found, try to play near the last move
+var nearbyMove = FindNearbyMove();
+            if (nearbyMove.HasValue) return nearbyMove.Value;
+
+      // If nothing else works, make a random move
+ return GetRandomMove();
+    }
+
+        private Point? FindNearbyMove()
+     {
+            // Find the last player's move
+    Point? lastMove = null;
+  for (int i = 0; i < BOARD_SIZE; i++)
+ {
+            for (int j = 0; j < BOARD_SIZE; j++)
+            {
+        if (_board[i, j].Text == "X")
+               {
+  lastMove = new Point(i, j);
+           break;
+                }
+     }
+  if (lastMove.HasValue) break;
+      }
+
+            if (!lastMove.HasValue) return null;
+
+// Try to play within 2 cells of the last move
+          for (int distance = 1; distance <= 2; distance++)
+ {
+         for (int i = -distance; i <= distance; i++)
+  {
+    for (int j = -distance; j <= distance; j++)
+       {
+             int newX = lastMove.Value.X + i;
+          int newY = lastMove.Value.Y + j;
+     
+     if (newX >= 0 && newX < BOARD_SIZE && 
+             newY >= 0 && newY < BOARD_SIZE && 
+  string.IsNullOrEmpty(_board[newX, newY].Text))
+              {
+              return new Point(newX, newY);
+              }
+    }
+            }
+          }
+
+        return null;
+      }
+
+        private Point? FindBestMove(string symbol, int targetCount)
+        {
+            // Check all possible directions for potential wins
+            for (int i = 0; i < BOARD_SIZE; i++)
+            {
+    for (int j = 0; j < BOARD_SIZE; j++)
+          {
+    if (!string.IsNullOrEmpty(_board[i, j].Text)) continue;
+
+  // Temporarily place the symbol
+     _board[i, j].Text = symbol;
+
+         bool hasWinningLine = false;
+           
+     // Check horizontal
+       int count = CountInDirection(i, j, 0, 1, symbol) + CountInDirection(i, j, 0, -1, symbol) - 1;
+                    hasWinningLine = count >= targetCount;
+
+              // Check vertical
+    if (!hasWinningLine)
+      {
+            count = CountInDirection(i, j, 1, 0, symbol) + CountInDirection(i, j, -1, 0, symbol) - 1;
+       hasWinningLine = count >= targetCount;
+         }
+
+   // Check diagonal
+         if (!hasWinningLine)
+         {
+    count = CountInDirection(i, j, 1, 1, symbol) + CountInDirection(i, j, -1, -1, symbol) - 1;
+       hasWinningLine = count >= targetCount;
+        }
+
+          // Check anti-diagonal
+     if (!hasWinningLine)
+    {
+  count = CountInDirection(i, j, 1, -1, symbol) + CountInDirection(i, j, -1, 1, symbol) - 1;
+   hasWinningLine = count >= targetCount;
+}
+
+    // Remove the temporary symbol
+      _board[i, j].Text = "";
+
+   if (hasWinningLine)
+         {
+    return new Point(i, j);
+     }
+                }
+       }
+
+        return null;
+        }
+
+        private int CountInDirection(int startX, int startY, int dx, int dy, string symbol)
+        {
+ int count = 0;
+          int x = startX;
+         int y = startY;
+
+    while (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE && 
+          _board[x, y].Text == symbol)
+            {
+       count++;
+           x += dx;
+          y += dy;
+      }
+
+  return count;
+      }
+
+        private bool CheckWin(Point lastMove)
+ {
+     string symbol = _board[lastMove.X, lastMove.Y].Text;
+            
+       // Check horizontal
+  int count = 1;
+    int i = lastMove.Y - 1;
+  while (i >= 0 && _board[lastMove.X, i].Text == symbol) { count++; i--; }
+          i = lastMove.Y + 1;
+       while (i < BOARD_SIZE && _board[lastMove.X, i].Text == symbol) { count++; i++; }
+        if (count >= 5) return true;
+
+ // Check vertical
+    count = 1;
+            i = lastMove.X - 1;
+            while (i >= 0 && _board[i, lastMove.Y].Text == symbol) { count++; i--; }
+    i = lastMove.X + 1;
+            while (i < BOARD_SIZE && _board[i, lastMove.Y].Text == symbol) { count++; i++; }
+ if (count >= 5) return true;
+
+       // Check diagonal
+      count = 1;
+   i = 1;
+            while (lastMove.X - i >= 0 && lastMove.Y - i >= 0 && _board[lastMove.X - i, lastMove.Y - i].Text == symbol) { count++; i++; }
+    i = 1;
+  while (lastMove.X + i < BOARD_SIZE && lastMove.Y + i < BOARD_SIZE && _board[lastMove.X + i, lastMove.Y + i].Text == symbol) { count++; i++; }
+          if (count >= 5) return true;
+
+            // Check anti-diagonal
+            count = 1;
+      i = 1;
+ while (lastMove.X - i >= 0 && lastMove.Y + i < BOARD_SIZE && _board[lastMove.X - i, lastMove.Y + i].Text == symbol) { count++; i++; }
+            i = 1;
+    while (lastMove.X + i < BOARD_SIZE && lastMove.Y - i >= 0 && _board[lastMove.X + i, lastMove.Y - i].Text == symbol) { count++; i++; }
+       if (count >= 5) return true;
+
+            return false;
+        }
+
+        private void ResetGame()
+        {
+    foreach (var button in _board)
+         {
+      button.Text = "";
+  }
+            _isPlayerXTurn = true;
+        }
+  }
+}

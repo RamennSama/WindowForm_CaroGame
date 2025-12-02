@@ -1,0 +1,616 @@
+﻿using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace WindowFormLastVersion
+{
+    public partial class CaroGameForm : Form
+    {
+        // Các biến quản lý logic game
+        private bool _isPlayerXTurn = true; // X đi trước
+private bool _isPlayingWithComputer;
+        private GameDifficulty _difficulty;
+
+        // Các hằng số
+        private const int BoardSize = 15;
+        private const int CellSize = 45;
+        private const int Margin = 30;
+     private int MaxGames = 5;
+
+      // Các biến lưu trữ trạng thái game
+        private Button[,] gameBoard;
+        private string playerXName = "Player X";
+        private string playerOName = "Player O";
+        private int playerXScore = 0;
+        private int playerOScore = 0;
+      private int gamesPlayed = 0;
+        private Label scoreLabel;
+
+    public enum GameDifficulty
+        {
+     Easy,
+ Medium,
+        Hard
+}
+
+      public CaroGameForm(bool playWithComputer = false, GameDifficulty difficulty = GameDifficulty.Easy, int maxGames = 5)
+        {
+          _isPlayingWithComputer = playWithComputer;
+    _difficulty = difficulty;
+   MaxGames = maxGames;
+
+            if (!playWithComputer)
+  {
+        // Chế độ 2 người chơi: hỏi tên và số ván
+         using var nameDialog = new NameInputDialog();
+           if (nameDialog.ShowDialog() == DialogResult.OK)
+    {
+        playerXName = nameDialog.PlayerXName;
+        playerOName = nameDialog.PlayerOName;
+            MaxGames = nameDialog.MaxGames;
+       }
+  else
+          {
+                    this.DialogResult = DialogResult.Cancel;
+      return;
+    }
+            }
+         
+            InitializeComponentCustom();
+     SetupGame();
+      this.FormClosing += CaroGameForm_FormClosing;
+        }
+
+ private void InitializeComponentCustom()
+        {
+  Text = _isPlayingWithComputer ? $"Caro Game - Playing with Computer ({_difficulty})" : $"Caro Game - {playerXName} vs {playerOName}";
+ ClientSize = new Size(BoardSize * CellSize + 2 * Margin, BoardSize * CellSize + 2 * Margin + 100);
+         BackColor = Color.White;
+          FormBorderStyle = FormBorderStyle.FixedSingle;
+    MaximizeBox = false;
+        StartPosition = FormStartPosition.CenterScreen;
+
+        // Tạo label hiển thị điểm số
+        scoreLabel = new Label
+   {
+       Text = GetScoreText(),
+           Location = new Point(Margin, BoardSize * CellSize + Margin + 10),
+                Size = new Size(ClientSize.Width - 2 * Margin, 40),
+    Font = new Font(Font.FontFamily, 12, FontStyle.Bold),
+     TextAlign = ContentAlignment.MiddleCenter
+         };
+     Controls.Add(scoreLabel);
+      }
+
+        private string GetScoreText()
+        {
+   return _isPlayingWithComputer
+            ? $"{playerXName}: {playerXScore} - Computer: {playerOScore} (Game {gamesPlayed + 1}/{MaxGames})"
+                : $"{playerXName}: {playerXScore} - {playerOName}: {playerOScore} (Game {gamesPlayed + 1}/{MaxGames})";
+        }
+
+   private void SetupGame()
+        {
+            gameBoard = new Button[BoardSize, BoardSize];
+
+       // Tạo bàn cờ 15x15
+ for (int i = 0; i < BoardSize; i++)
+            {
+     for (int j = 0; j < BoardSize; j++)
+    {
+      var cell = new Button
+      {
+   Location = new Point(Margin + j * CellSize, Margin + i * CellSize),
+     Size = new Size(CellSize, CellSize),
+       BackColor = SystemColors.ButtonFace,
+               Font = new Font(Font.FontFamily, 16, FontStyle.Bold),
+      Tag = new Point(i, j),
+           UseVisualStyleBackColor = true
+          };
+
+            cell.Click += Cell_Click;
+        Controls.Add(cell);
+  gameBoard[i, j] = cell;
+       }
+ }
+
+    // Tạo style cho label điểm số (bo góc tròn)
+      scoreLabel.BackColor = SystemColors.ActiveCaption;
+       scoreLabel.ForeColor = Color.Black;
+ GraphicsPath labelPath = new GraphicsPath();
+  int labelRadius = 10;
+       labelPath.AddArc(0, 0, labelRadius, labelRadius, 180, 90);
+        labelPath.AddArc(scoreLabel.Width - labelRadius, 0, labelRadius, labelRadius, 270, 90);
+         labelPath.AddArc(scoreLabel.Width - labelRadius, scoreLabel.Height - labelRadius, labelRadius, labelRadius, 0, 90);
+            labelPath.AddArc(0, scoreLabel.Height - labelRadius, labelRadius, labelRadius, 90, 90);
+    labelPath.CloseAllFigures();
+            scoreLabel.Region = new Region(labelPath);
+  }
+
+        private void Cell_Click(object sender, EventArgs e)
+        {
+    var button = (Button)sender;
+  if (!string.IsNullOrEmpty(button.Text)) return;
+
+            // Đánh dấu nước đi
+            button.Text = _isPlayerXTurn ? "X" : "O";
+          button.ForeColor = _isPlayerXTurn ? Color.Blue : Color.Red;
+
+            // Kiểm tra thắng
+   if (CheckWin((Point)button.Tag))
+            {
+  string winnerName = _isPlayerXTurn ? playerXName : playerOName;
+     
+      using (var winDialog = new WinnerDialog(winnerName))
+    {
+  winDialog.ShowDialog(this);
+         }
+
+           if (!_isPlayingWithComputer)
+             {
+ // Cập nhật điểm cho chế độ 2 người chơi
+           if (_isPlayerXTurn)
+   playerXScore++;
+      else
+              playerOScore++;
+
+   gamesPlayed++;
+
+   if (gamesPlayed >= MaxGames)
+         {
+    // Kết thúc giải đấu
+               string finalWinner = playerXScore > playerOScore ? playerXName :
+    playerOScore > playerXScore ? playerOName : "Draw";
+    string scoreInfo = $"{playerXName}: {playerXScore} - {playerOName}: {playerOScore}";
+   
+     using (var finalDialog = new WinnerDialog(finalWinner, isFinalWinner: true, scoreInfo: scoreInfo))
+          {
+           finalDialog.ShowDialog(this);
+            }
+      
+                this.DialogResult = DialogResult.OK;
+      this.Close();
+      return;
+        }
+               else
+    {
+             ResetGame();
+     scoreLabel.Text = GetScoreText();
+             return;
+       }
+           }
+  else
+     {
+                // Chế độ chơi với máy: người chơi thắng
+             playerXScore++;
+  gamesPlayed++;
+         
+    if (gamesPlayed >= MaxGames)
+ {
+       string finalWinner = playerXScore > playerOScore ? playerXName :
+        playerOScore > playerXScore ? "Computer" : "Draw";
+        string scoreInfo = $"{playerXName}: {playerXScore} - Computer: {playerOScore}";
+  
+ using (var finalDialog = new WinnerDialog(finalWinner, isFinalWinner: true, scoreInfo: scoreInfo))
+             {
+           finalDialog.ShowDialog(this);
+     }
+  
+this.DialogResult = DialogResult.OK;
+          this.Close();
+              return;
+          }
+       else
+       {
+             ResetGame();
+          scoreLabel.Text = GetScoreText();
+  return;
+        }
+         }
+            }
+
+            _isPlayerXTurn = !_isPlayerXTurn;
+
+            // Lượt của máy
+ if (_isPlayingWithComputer && !_isPlayerXTurn)
+            {
+    MakeComputerMove();
+            }
+ }
+
+   private void MakeComputerMove()
+      {
+   Point move = GetComputerMove();
+            var button = gameBoard[move.X, move.Y];
+   button.Text = "O";
+            button.ForeColor = Color.Red;
+
+   // Kiểm tra máy thắng
+  if (CheckWin(move))
+   {
+    using (var winDialog = new WinnerDialog("Computer"))
+    {
+     winDialog.ShowDialog(this);
+              }
+  
+playerOScore++;
+      gamesPlayed++;
+                
+    if (gamesPlayed >= MaxGames)
+{
+        string finalWinner = playerXScore > playerOScore ? playerXName :
+       playerOScore > playerXScore ? "Computer" : "Draw";
+      string scoreInfo = $"{playerXName}: {playerXScore} - Computer: {playerOScore}";
+ 
+using (var finalDialog = new WinnerDialog(finalWinner, isFinalWinner: true, scoreInfo: scoreInfo))
+         {
+    finalDialog.ShowDialog(this);
+     }
+        
+       this.DialogResult = DialogResult.OK;
+  this.Close();
+    return;
+         }
+     else
+         {
+         ResetGame();
+   scoreLabel.Text = GetScoreText();
+                return;
+       }
+   }
+
+      _isPlayerXTurn = true;
+        }
+
+    private Point GetComputerMove()
+  {
+     switch (_difficulty)
+    {
+         case GameDifficulty.Easy:
+          return GetRandomMove();
+         case GameDifficulty.Medium:
+           return GetMediumMove();
+                case GameDifficulty.Hard:
+          return GetHardMove();
+            default:
+               return GetRandomMove();
+       }
+        }
+
+      // Độ khó Easy: đi ngẫu nhiên
+        private Point GetRandomMove()
+        {
+   var emptyCells = new List<Point>();
+   for (int i = 0; i < BoardSize; i++)
+            {
+  for (int j = 0; j < BoardSize; j++)
+      {
+         if (string.IsNullOrEmpty(gameBoard[i, j].Text))
+    {
+      emptyCells.Add(new Point(i, j));
+          }
+      }
+        }
+         int index = Random.Shared.Next(emptyCells.Count);
+     return emptyCells[index];
+        }
+
+  private Point GetSmartMove()
+        {
+            return GetHardMove();
+  }
+
+        // Độ khó Hard: phân tích tất cả các nước đi có thể
+      private Point GetHardMove()
+     {
+    var possibleMoves = new List<MoveScore>();
+
+            for (int i = 0; i < BoardSize; i++)
+{
+          for (int j = 0; j < BoardSize; j++)
+    {
+           if (string.IsNullOrEmpty(gameBoard[i, j].Text))
+            {
+  var score = EvaluateMove(i, j);
+             possibleMoves.Add(new MoveScore { Move = new Point(i, j), Score = score });
+         }
+                }
+            }
+
+    // Chọn nước đi có điểm cao nhất
+   if (possibleMoves.Any())
+        {
+      var maxScore = possibleMoves.Max(m => m.Score);
+    var bestMoves = possibleMoves.Where(m => m.Score == maxScore).ToList();
+             return bestMoves[Random.Shared.Next(bestMoves.Count)].Move;
+    }
+
+            return GetRandomMove();
+        }
+
+     // Độ khó Medium: sử dụng 85% logic của Hard
+        private Point GetMediumMove()
+{
+       var possibleMoves = new List<MoveScore>();
+
+            for (int i = 0; i < BoardSize; i++)
+         {
+      for (int j = 0; j < BoardSize; j++)
+           {
+     if (string.IsNullOrEmpty(gameBoard[i, j].Text))
+         {
+     var score = EvaluateMove(i, j) * 0.85;
+
+// Tăng điểm cho nước đi chặn đối thủ
+          if (IsBlockingMove(i, j))
+       {
+           score *= 1.5;
+         }
+
+         possibleMoves.Add(new MoveScore { Move = new Point(i, j), Score = (int)score });
+        }
+      }
+        }
+
+            if (possibleMoves.Any())
+ {
+  // Chọn trong top 2 nước đi tốt nhất
+    var topMoves = possibleMoves
+.OrderByDescending(m => m.Score)
+  .Take(2)
+             .ToList();
+    
+           // 80% chọn nước tốt nhất, 20% chọn nước thứ 2
+    if (topMoves.Count > 1 && Random.Shared.Next(0, 5) == 0)
+      {
+          return topMoves[1].Move;
+       }
+         return topMoves[0].Move;
+          }
+
+    return GetRandomMove();
+        }
+
+// Kiểm tra xem nước đi có chặn đối thủ không
+        private bool IsBlockingMove(int x, int y)
+        {
+  gameBoard[x, y].Text = "X";
+
+            foreach (var direction in new[] {
+    (dx: 1, dy: 0), // Ngang
+                (dx: 0, dy: 1),   // Dọc
+      (dx: 1, dy: 1),   // Chéo xuống
+                (dx: 1, dy: -1)   // Chéo lên
+            })
+     {
+            int count = CountInDirection(x, y, direction.dx, direction.dy, "X") +
+ CountInDirection(x, y, -direction.dx, -direction.dy, "X") - 1;
+
+         if (count >= 3)
+      {
+        gameBoard[x, y].Text = "";
+     return true;
+       }
+  }
+
+   gameBoard[x, y].Text = "";
+  return false;
+        }
+
+     // Đánh giá điểm số của một nước đi
+        private int EvaluateMove(int x, int y)
+      {
+  int score = 0;
+
+            // Kiểm tra cả máy (O) và người chơi (X)
+    foreach (var symbol in new[] { "O", "X" })
+ {
+                bool isComputer = symbol == "O";
+           int multiplier = isComputer ? 1 : 2; // Ưu tiên chặn người chơi
+
+         gameBoard[x, y].Text = symbol;
+
+        // Đánh giá theo 4 hướng
+          foreach (var direction in new[] {
+       (dx: 1, dy: 0),   // Ngang
+    (dx: 0, dy: 1),   // Dọc
+   (dx: 1, dy: 1),   // Chéo xuống
+        (dx: 1, dy: -1)   // Chéo lên
+ })
+                {
+                    int count = CountInDirection(x, y, direction.dx, direction.dy, symbol) +
+        CountInDirection(x, y, -direction.dx, -direction.dy, symbol) - 1;
+
+           score += multiplier * CalculateSequenceScore(count);
+
+      int openEnds = CountOpenEnds(x, y, direction.dx, direction.dy, symbol);
+     score += multiplier * openEnds * 5;
+
+  // Trường hợp đặc biệt
+               if (count >= 4) score += multiplier * 1000; // Sắp thắng/chặn
+    if (count == 3 && openEnds == 2) score += multiplier * 500; // 3 con 2 đầu thông
+ }
+
+       gameBoard[x, y].Text = "";
+            }
+
+  // Điểm vị trí chiến lược
+        score += EvaluatePosition(x, y);
+
+         return score;
+   }
+
+        // Tính điểm dựa trên độ dài chuỗi
+        private int CalculateSequenceScore(int count)
+    {
+      return count switch
+            {
+             5 => 10000, // Thắng
+      4 => 1000,  // Còn 1 nước nữa thắng
+  3 => 100,   // Còn 2 nước nữa thắng
+     2 => 10,    // Đang xây dựng chuỗi
+                _ => 1
+            };
+        }
+
+      // Đếm số đầu thông của chuỗi
+        private int CountOpenEnds(int x, int y, int dx, int dy, string symbol)
+        {
+      int openEnds = 0;
+
+         // Kiểm tra một đầu
+      int nextX = x + dx * (CountInDirection(x, y, dx, dy, symbol));
+            int nextY = y + dy * (CountInDirection(x, y, dx, dy, symbol));
+     if (IsValidPosition(nextX, nextY) && string.IsNullOrEmpty(gameBoard[nextX, nextY].Text))
+       openEnds++;
+
+            // Kiểm tra đầu kia
+ nextX = x - dx * (CountInDirection(x, y, -dx, -dy, symbol));
+      nextY = y - dy * (CountInDirection(x, y, -dx, -dy, symbol));
+   if (IsValidPosition(nextX, nextY) && string.IsNullOrEmpty(gameBoard[nextX, nextY].Text))
+       openEnds++;
+
+      return openEnds;
+ }
+
+      private bool IsValidPosition(int x, int y)
+        {
+ return x >= 0 && x < BoardSize && y >= 0 && y < BoardSize;
+        }
+
+        // Đánh giá vị trí chiến lược
+        private int EvaluatePosition(int x, int y)
+        {
+       // Vị trí gần trung tâm có giá trị cao hơn
+     int centerX = BoardSize / 2;
+ int centerY = BoardSize / 2;
+          int distanceFromCenter = Math.Abs(x - centerX) + Math.Abs(y - centerY);
+            int positionScore = (BoardSize - distanceFromCenter) * 2;
+
+  // Vị trí gần các quân cờ khác có giá trị cao hơn
+    int nearbyPieces = CountNearbyPieces(x, y);
+positionScore += nearbyPieces * 5;
+
+      return positionScore;
+        }
+
+        // Đếm số quân cờ xung quanh
+        private int CountNearbyPieces(int x, int y)
+      {
+ int count = 0;
+      for (int i = -1; i <= 1; i++)
+ {
+            for (int j = -1; j <= 1; j++)
+      {
+        if (i == 0 && j == 0) continue;
+           int newX = x + i;
+        int newY = y + j;
+      if (IsValidPosition(newX, newY) && !string.IsNullOrEmpty(gameBoard[newX, newY].Text))
+       {
+         count++;
+             }
+        }
+     }
+     return count;
+        }
+
+      // Reset bàn cờ cho ván mới
+        private void ResetGame()
+   {
+          for (int i = 0; i < BoardSize; i++)
+      {
+    for (int j = 0; j < BoardSize; j++)
+  {
+    gameBoard[i, j].Text = "";
+      gameBoard[i, j].ForeColor = Color.Black;
+         }
+     }
+       _isPlayerXTurn = true;
+       scoreLabel.Text = GetScoreText();
+        }
+
+        // Kiểm tra điều kiện thắng (5 con liên tiếp)
+        private bool CheckWin(Point move)
+{
+   string symbol = gameBoard[move.X, move.Y].Text;
+       foreach (var direction in new[] {
+             (dx: 1, dy: 0),   // Ngang
+         (dx: 0, dy: 1),   // Dọc
+     (dx: 1, dy: 1),   // Chéo xuống
+            (dx: 1, dy: -1)   // Chéo lên
+            })
+            {
+       if (CountInDirection(move.X, move.Y, direction.dx, direction.dy, symbol) +
+         CountInDirection(move.X, move.Y, -direction.dx, -direction.dy, symbol) - 1 >= 5)
+      {
+    return true;
+ }
+         }
+      return false;
+        }
+
+        // Đếm số quân cờ liên tiếp theo một hướng
+        private int CountInDirection(int x, int y, int dx, int dy, string symbol)
+        {
+            int count = 0;
+            while (IsValidPosition(x, y) && gameBoard[x, y].Text == symbol)
+            {
+                count++;
+ x += dx;
+                y += dy;
+  }
+            return count;
+        }
+
+        private Point? FindNearbyMove()
+        {
+      var emptyCells = new List<Point>();
+            for (int i = 0; i < BoardSize; i++)
+      {
+     for (int j = 0; j < BoardSize; j++)
+     {
+                  if (string.IsNullOrEmpty(gameBoard[i, j].Text) && CountNearbyPieces(i, j) > 0)
+         {
+   emptyCells.Add(new Point(i, j));
+          }
+   }
+            }
+          return emptyCells.Any() ? emptyCells[Random.Shared.Next(emptyCells.Count)] : null;
+   }
+
+        private void CaroGameForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+     if (e.CloseReason == CloseReason.UserClosing && this.DialogResult == DialogResult.None)
+            {
+        this.DialogResult = DialogResult.Cancel;
+            }
+        }
+
+      private void UpdateScore(int xScore, int oScore)
+        {
+            playerXScore += xScore;
+   playerOScore += oScore;
+     gamesPlayed++;
+
+       scoreLabel.Text = GetScoreText();
+
+if (gamesPlayed >= MaxGames)
+      {
+                MessageBox.Show($"{playerXName}: {playerXScore} - {playerOName}: {playerOScore}\n\nMax games reached. Restarting...");
+    playerXScore = 0;
+                playerOScore = 0;
+     gamesPlayed = 0;
+            scoreLabel.Text = GetScoreText();
+            }
+        }
+
+        private class MoveScore
+        {
+            public Point Move { get; set; }
+  public int Score { get; set; }
+      }
+    }
+}

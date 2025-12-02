@@ -1,0 +1,159 @@
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace WindowFormLastVersion
+{
+    public partial class NameInputDialog : Form
+  {
+        public string PlayerXName { get; private set; } = "Player X";
+        public string PlayerOName { get; private set; } = "Player O";
+        public int MaxGames { get; private set; } = 5;
+ 
+    private TextBox txtPlayerX;
+private TextBox txtPlayerO;
+     private NumericUpDown numMaxGames;
+     private Button btnOK;
+        private Button btnCancel;
+
+        public NameInputDialog()
+ {
+            InitializeComponent();
+ }
+
+        private void InitializeComponent()
+        {
+            this.Text = "Enter Player Names and Game Settings";
+      this.ClientSize = new System.Drawing.Size(440, 280);
+       this.FormBorderStyle = FormBorderStyle.FixedDialog;
+       this.MaximizeBox = false;
+   this.MinimizeBox = false;
+   this.StartPosition = FormStartPosition.CenterParent;
+        this.BackColor = Color.White;
+
+          // Tiêu đề
+            var lblTitle = new Label
+   {
+      Text = "Player Settings",
+       Font = new Font("Times New Roman", 20, FontStyle.Bold),
+     Location = new Point(0, 40),
+   Size = new Size(440, 40),
+     TextAlign = ContentAlignment.MiddleCenter,
+     BackColor = SystemColors.ControlLight,
+     ForeColor = Color.Black
+            };
+
+            // Label và TextBox cho Player X
+            var lblPlayerX = new Label
+            {
+     Text = "Player X",
+          Font = new Font("Times New Roman", 14, FontStyle.Regular),
+   Location = new Point(40, 100),
+    Size = new Size(120, 30),
+         TextAlign = ContentAlignment.MiddleLeft,
+          ForeColor = Color.DarkBlue
+ };
+         
+      txtPlayerX = new TextBox
+            {
+  Text = "Player X",
+      Font = new Font("Times New Roman", 14),
+ Location = new Point(170, 100),
+                Size = new Size(220, 30),
+        BackColor = Color.White,
+         ForeColor = Color.Black
+     };
+            txtPlayerX.Enter += (s, e) => { txtPlayerX.BackColor = Color.White; txtPlayerX.BorderStyle = BorderStyle.FixedSingle; };
+     txtPlayerX.Leave += (s, e) => { txtPlayerX.BorderStyle = BorderStyle.FixedSingle; };
+
+        // Label và TextBox cho Player O
+    var lblPlayerO = new Label
+ {
+      Text = "Player O",
+Font = new Font("Times New Roman", 14, FontStyle.Regular),
+     Location = new Point(40, 140),
+      Size = new Size(120, 30),
+        TextAlign = ContentAlignment.MiddleLeft,
+           ForeColor = Color.DarkBlue
+    };
+            
+         txtPlayerO = new TextBox
+         {
+  Text = "Player O",
+        Font = new Font("Times New Roman", 14),
+           Location = new Point(170, 140),
+          Size = new Size(220, 30),
+      BackColor = Color.White,
+         ForeColor = Color.Black
+  };
+            txtPlayerO.Enter += (s, e) => { txtPlayerO.BackColor = Color.White; txtPlayerO.BorderStyle = BorderStyle.FixedSingle; };
+   txtPlayerO.Leave += (s, e) => { txtPlayerO.BorderStyle = BorderStyle.FixedSingle; };
+
+         // Label và NumericUpDown cho số ván chơi
+         var lblMaxGames = new Label
+   {
+                Text = "Number of",
+                Font = new Font("Times New Roman", 14, FontStyle.Regular),
+             Location = new Point(40, 180),
+        Size = new Size(120, 30),
+     TextAlign = ContentAlignment.MiddleLeft,
+ ForeColor = Color.DarkBlue
+            };
+            
+            numMaxGames = new NumericUpDown
+   {
+        Font = new Font("Times New Roman", 14),
+      Location = new Point(170, 180),
+     Size = new Size(220, 30),
+   Minimum = 1,
+      Maximum = 10,
+                Value = 5,
+   BorderStyle = BorderStyle.FixedSingle
+      };
+
+            // Nút OK
+btnOK = new Button
+         {
+    Text = "OK",
+     Font = new Font("Times New Roman", 14),
+         Size = new Size(120, 40),
+     Location = new Point(90, 230),
+  BackColor = Color.White,
+ ForeColor = Color.Black,
+     FlatStyle = FlatStyle.Flat,
+      DialogResult = DialogResult.OK
+     };
+       btnOK.FlatAppearance.BorderSize = 2;
+   btnOK.FlatAppearance.BorderColor = Color.DarkBlue;
+            btnOK.Click += BtnOK_Click;
+
+  // Nút Cancel
+          btnCancel = new Button
+      {
+    Text = "Cancel",
+    Font = new Font("Times New Roman", 14),
+     Size = new Size(120, 40),
+      Location = new Point(230, 230),
+            BackColor = Color.White,
+                ForeColor = Color.Black,
+        FlatStyle = FlatStyle.Flat,
+      DialogResult = DialogResult.Cancel
+            };
+   btnCancel.FlatAppearance.BorderSize = 2;
+ btnCancel.FlatAppearance.BorderColor = Color.DarkBlue;
+
+          // Thêm các control vào form
+            this.Controls.AddRange(new Control[] { lblTitle, lblPlayerX, txtPlayerX, lblPlayerO, txtPlayerO, lblMaxGames, numMaxGames, btnOK, btnCancel });
+ this.AcceptButton = btnOK;
+this.CancelButton = btnCancel;
+        }
+
+        private void BtnOK_Click(object sender, EventArgs e)
+        {
+ // Lấy tên người chơi, nếu để trống thì dùng tên mặc định
+         PlayerXName = string.IsNullOrWhiteSpace(txtPlayerX.Text) ? "Player X" : txtPlayerX.Text.Trim();
+       PlayerOName = string.IsNullOrWhiteSpace(txtPlayerO.Text) ? "Player O" : txtPlayerO.Text.Trim();
+    MaxGames = (int)numMaxGames.Value;
+        }
+    }
+}

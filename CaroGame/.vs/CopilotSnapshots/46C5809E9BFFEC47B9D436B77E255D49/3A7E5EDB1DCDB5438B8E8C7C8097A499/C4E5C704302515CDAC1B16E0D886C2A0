@@ -1,0 +1,157 @@
+﻿using System;
+using System.Windows.Forms;
+
+namespace WindowFormLastVersion
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // Two players mode
+            var gameForm = new CaroGameForm(playWithComputer: false);
+            gameForm.ShowDialog();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Text = "Caro Game";
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // Play with computer - show difficulty selection
+            using var difficultyForm = new DifficultySelectForm();
+            if (difficultyForm.ShowDialog() == DialogResult.OK)
+            {
+                var gameForm = new CaroGameForm(playWithComputer: true, difficulty: difficultyForm.SelectedDifficulty);
+                gameForm.ShowDialog();
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+    }
+
+    public partial class CaroGameForm : Form
+    {
+        private const int BOARD_SIZE = 15;
+        private const int CELL_SIZE = 40;
+        private const int MARGIN = 30;
+        private const int SCORE_WIN = 10; // Points for winning
+        private const int SCORE_FORFEIT = 5; // Points lost for forfeiting
+
+        private Button[,] _board;
+        private bool _isPlayerXTurn = true;
+        private bool _isPlayingWithComputer;
+        private GameDifficulty _difficulty;
+        private Button _exitButton;
+        private Button _newGameButton;
+        private Button _viewScoreButton;
+        private Label _scoreLabel;
+        private int _playerXScore = 0;
+        private int _playerOScore = 0;
+
+        public CaroGameForm(bool playWithComputer = false, GameDifficulty difficulty = GameDifficulty.Easy)
+        {
+            _isPlayingWithComputer = playWithComputer;
+            _difficulty = difficulty;
+            InitializeComponent();
+            SetupGame();
+            LoadScores(); // Load existing scores
+            this.FormClosing += CaroGameForm_FormClosing;
+        }
+
+            private void InitializeComponent()
+        {
+            Text = _isPlayingWithComputer ? $"Caro Game - Playing with Computer ({_difficulty})" : "Caro Game - 2 Players";
+            ClientSize = new Size(BOARD_SIZE * CELL_SIZE + 2 * MARGIN, BOARD_SIZE * CELL_SIZE + 2 * MARGIN + 50); // Added space for button
+            BackColor = Color.White;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            StartPosition = FormStartPosition.CenterScreen;
+
+            // Create exit button
+            _exitButton = new Button
+            {
+                Text = "Return to Menu",
+                Size = new Size(120, 30),
+                Location = new Point((ClientSize.Width - 120) / 2, BOARD_SIZE * CELL_SIZE + MARGIN + 10),
+                BackColor = Color.FromArgb(220, 53, 69), // Bootstrap red color
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            _exitButton.Click += (s, e) => 
+            {
+                if (MessageBox.Show("Do you want to return to main menu?", "Return to Menu", 
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+            };
+            Controls.Add(_exitButton);
+        }
+
+        protected override bool ProcessDialogKey(Keys keyData)
+        {
+            // Prevent closing form with Esc key
+            if (keyData == Keys.Escape)
+                return true;
+            return base.ProcessDialogKey(keyData);
+        }
+
+        private void CaroGameForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Only show confirmation if closing from the X button
+            if (e.CloseReason == CloseReason.UserClosing && this.DialogResult != DialogResult.OK)
+            {
+                if (MessageBox.Show("Do you want to return to main menu?", "Return to Menu",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        private void LoadScores()
+        {
+            // Load scores from settings
+            _playerXScore = Properties.Settings.Default.PlayerXScore;
+            _playerOScore = Properties.Settings.Default.PlayerOScore;
+        }
+
+        private void SaveScores()
+        {
+            // Save scores to settings
+            Properties.Settings.Default.PlayerXScore = _playerXScore;
+            Properties.Settings.Default.PlayerOScore = _playerOScore;
+            Properties.Settings.Default.Save();
+        }
+
+        private void btnForfeit_Click(object sender, EventArgs e)
+        {
+            // Forfeit the game
+            if (MessageBox.Show("Are you sure you want to forfeit?", "Confirm Forfeit",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                // Loser gets SCORE_FORFEIT points
+                if (_isPlayerXTurn)
+                    _playerOScore += SCORE_FORFEIT;
+                else
+                    _playerXScore += SCORE_FORFEIT;
+
+                SaveScores();
+                MessageBox.Show("You have forfeited the game.", "Game Over",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Close();
+            }
+        }
+    }
+}

@@ -1,0 +1,69 @@
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace WindowFormLastVersion
+{
+    public partial class DifficultySelectForm : Form
+    {
+      public CaroGameForm.GameDifficulty SelectedDifficulty { get; private set; }
+
+     public DifficultySelectForm()
+        {
+InitializeComponent();
+            SetupForm();
+        }
+
+    private void InitializeComponent()
+        {
+         Text = "Select difficulty";
+            Size = new Size(300, 200);
+      StartPosition = FormStartPosition.CenterParent;
+     FormBorderStyle = FormBorderStyle.FixedDialog;
+        MaximizeBox = false;
+   MinimizeBox = false;
+     }
+
+private void SetupForm()
+        {
+      var easyButton = new Button
+            {
+ Text = "Easy",
+       Location = new Point(50, 20),
+   Size = new Size(200, 30),
+                BackColor = SystemColors.ActiveCaption,
+                Font = new Font("Times New Roman", 13.8f)
+      };
+            easyButton.Click += (s, e) => SelectDifficulty(CaroGameForm.GameDifficulty.Easy);
+
+        var mediumButton = new Button
+        {
+         Text = "Medium",
+      Location = new Point(50, 70),
+      Size = new Size(200, 30),
+    BackColor = SystemColors.ActiveCaption,
+        Font = new Font("Times New Roman", 13.8f)
+            };
+            mediumButton.Click += (s, e) => SelectDifficulty(CaroGameForm.GameDifficulty.Medium);
+
+      var hardButton = new Button
+        {
+     Text = "Hard",
+   Location = new Point(50, 120),
+     Size = new Size(200, 30),
+       BackColor = SystemColors.ActiveCaption,
+      Font = new Font("Times New Roman", 13.8f)
+         };
+            hardButton.Click += (s, e) => SelectDifficulty(CaroGameForm.GameDifficulty.Hard);
+
+            Controls.AddRange(new Control[] { easyButton, mediumButton, hardButton });
+   }
+
+        private void SelectDifficulty(CaroGameForm.GameDifficulty difficulty)
+        {
+            SelectedDifficulty = difficulty;
+      DialogResult = DialogResult.OK;
+            Close();
+        }
+    }
+}

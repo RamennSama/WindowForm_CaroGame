@@ -1,0 +1,86 @@
+﻿using System;
+using System.Windows.Forms;
+
+namespace WindowFormLastVersion
+{
+    public partial class NameInputDialog : Form
+    {
+        public string PlayerXName { get; private set; } = "Player X";
+        public string PlayerOName { get; private set; } = "Player O";
+
+        private TextBox txtPlayerX;
+        private TextBox txtPlayerO;
+        private Button btnOK;
+        private Button btnCancel;
+
+        public NameInputDialog()
+        {
+            InitializeComponent();
+        }
+
+        private void InitializeComponent()
+        {
+            this.Text = "Enter Player Names";
+            this.ClientSize = new System.Drawing.Size(300, 150);
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.StartPosition = FormStartPosition.CenterParent;
+
+            var lblPlayerX = new Label
+            {
+                Text = "Player X Name:",
+                Location = new System.Drawing.Point(20, 20),
+                Size = new System.Drawing.Size(100, 20)
+            };
+
+            txtPlayerX = new TextBox
+            {
+                Text = "Player X",
+                Location = new System.Drawing.Point(130, 20),
+                Size = new System.Drawing.Size(150, 20)
+            };
+
+            var lblPlayerO = new Label
+            {
+                Text = "Player O Name:",
+                Location = new System.Drawing.Point(20, 50),
+                Size = new System.Drawing.Size(100, 20)
+            };
+
+            txtPlayerO = new TextBox
+            {
+                Text = "Player O",
+                Location = new System.Drawing.Point(130, 50),
+                Size = new System.Drawing.Size(150, 20)
+            };
+
+            btnOK = new Button
+            {
+                Text = "OK",
+                Location = new System.Drawing.Point(80, 90),
+                Size = new System.Drawing.Size(60, 30),
+                DialogResult = DialogResult.OK
+            };
+            btnOK.Click += BtnOK_Click;
+
+            btnCancel = new Button
+            {
+                Text = "Cancel",
+                Location = new System.Drawing.Point(160, 90),
+                Size = new System.Drawing.Size(60, 30),
+                DialogResult = DialogResult.Cancel
+            };
+
+            this.Controls.AddRange(new Control[] { lblPlayerX, txtPlayerX, lblPlayerO, txtPlayerO, btnOK, btnCancel });
+            this.AcceptButton = btnOK;
+            this.CancelButton = btnCancel;
+        }
+
+        private void BtnOK_Click(object sender, EventArgs e)
+        {
+            PlayerXName = string.IsNullOrWhiteSpace(txtPlayerX.Text) ? "Player X" : txtPlayerX.Text.Trim();
+            PlayerOName = string.IsNullOrWhiteSpace(txtPlayerO.Text) ? "Player O" : txtPlayerO.Text.Trim();
+        }
+    }
+}

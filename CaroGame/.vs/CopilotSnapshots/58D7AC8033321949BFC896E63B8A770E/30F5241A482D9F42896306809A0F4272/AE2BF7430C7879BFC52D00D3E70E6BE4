@@ -1,0 +1,88 @@
+﻿// winnerlog : hàm hiển thị người chiến thắng
+
+// ========== THÔNG TIN CÁC FILE TRONG PROJECT ==========
+
+// === Form1.cs ===
+// Form chính (Main Menu)
+// - Hiển thị menu chính với 3 nút:
+//   + button1: Chế độ 2 người chơi
+//   + button2: Chơi với máy (chọn độ khó)
+//   + button3: Thoát game
+// - SetupRoundedLabel(): Tạo label bo góc tròn
+// - Form1_FormClosing(): Hỏi xác nhận trước khi thoát
+
+// === CaroGameForm.cs ===
+// Form game Caro chính
+// - Quản lý bàn cờ 15x15
+// - Xử lý logic game: đánh cờ, kiểm tra thắng, reset game
+// - Chế độ chơi:
+//   + 2 người chơi
+//   + Chơi với máy (3 độ khó: Easy, Medium, Hard)
+// - GetEasyMove(): AI độ khó Easy (40% logic, biết chặn cơ bản)
+// - GetMediumMove(): AI độ khó Medium (85% logic, chặn tốt, tấn công mạnh)
+// - GetHardMove(): AI độ khó Hard (100% logic, chơi hoàn hảo)
+// - EvaluateMove(): Đánh giá điểm số của mỗi nước đi
+// - CheckWin(): Kiểm tra điều kiện thắng (5 con liên tiếp)
+// - ResetGame(): Reset bàn cờ cho ván mới
+
+// === NameInputDialog.cs ===
+// Dialog nhập tên người chơi (chế độ 2 người)
+// - txtPlayerX: TextBox nhập tên Player X
+// - txtPlayerO: TextBox nhập tên Player O
+// - numMaxGames: Chọn số ván chơi (1-10)
+// - BtnOK_Click(): Lấy tên người chơi, nếu để trống dùng tên mặc định
+
+// === DifficultySelectForm.cs ===
+// Dialog chọn độ khó (chế độ chơi với máy)
+// - easyButton: Nút chọn độ khó Easy
+// - mediumButton: Nút chọn độ khó Medium  
+// - hardButton: Nút chọn độ khó Hard
+// - numMaxGames: Chọn số ván chơi (1-10)
+// - DifficultyButton_Click(): Đổi màu nút được chọn (SteelBlue)
+// - BtnOK_Click(): Kiểm tra đã chọn độ khó chưa
+
+// === WinnerDialog.cs ===
+// Dialog hiển thị người chiến thắng
+// - Hiển thị tên người thắng
+// - isFinalWinner = false: "WINNER!" (thắng 1 ván)
+// - isFinalWinner = true: "CHAMPION!" (thắng giải đấu)
+// - scoreInfo: Hiển thị điểm số cuối cùng (nếu có)
+// - Style đơn giản, font Times New Roman
+
+// === Form1.Designer.cs ===
+// Designer code cho Form1
+// - Tạo các control: label1, label2, button1, button2, button3
+// - Thiết lập layout, màu sắc, font chữ cho menu chính
+
+// ========== CẤU TRÚC PROJECT ==========
+// WindowFormLastVersion/
+// ├── Form1.cs           // Main menu
+// ├── Form1.Designer.cs    // Designer code
+// ├── CaroGameForm.cs         // Game logic chính
+// ├── NameInputDialog.cs         // Dialog nhập tên
+// ├── DifficultySelectForm.cs    // Dialog chọn độ khó
+// ├── WinnerDialog.cs // Dialog thông báo thắng
+// ├── Program.cs            // Entry point
+// └── info.txt          // File này
+
+// ========== CÁCH HOẠT ĐỘNG ==========
+// 1. Form1 (Menu) → Chọn chế độ chơi
+// 2a. Nếu chọn "2 người chơi":
+///     → NameInputDialog → CaroGameForm (2 players mode)
+/// 2b. Nếu chọn "Chơi với máy":
+///   → DifficultySelectForm → CaroGameForm (vs Computer mode)
+/// 3. Khi có người thắng:
+///     → WinnerDialog hiển thị kết quả
+/// 4. Sau mỗi ván:
+///     - Nếu chưa đủ số ván → Reset game, tiếp tục
+///     - Nếu đủ số ván → WinnerDialog (CHAMPION) → Đóng game
+
+// ========== CÁC TÍNH NĂNG CHÍNH ==========
+// ✅ Chơi 2 người
+// ✅ Chơi với máy (3 độ khó)
+// ✅ Chọn số ván chơi (1-10)
+// ✅ Nhập tên người chơi
+// ✅ Hiển thị điểm số real-time
+// ✅ AI thông minh (biết chặn, tấn công)
+// ✅ Dialog đẹp, gọn gàng
+// ✅ Xác nhận trước khi thoát
